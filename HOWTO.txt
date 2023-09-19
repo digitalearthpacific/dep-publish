@@ -8,6 +8,11 @@ curl -u admin:geoserver -XPUT --write-out %{http_code} -H "Content-type:applicat
 
 2. Modify product parameters and run loader.py. Execute generated loader.sh on the Geoserver instance.
 
+3. Init and Register Mosiac after modifying coverage.xml
+
+curl -v -u admin:geoserver -XGET http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/mangroves/coverages.xml?list=all
+curl -v -u admin:geoserver -XPOST -H "Content-type: text/xml" -d @"coverage.xml" "http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/mangroves/coverages"
+
 3. Apply styles
 
 

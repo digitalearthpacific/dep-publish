@@ -16,7 +16,7 @@ for blob in blob_list:
     fn = blob.name
     if fn.startswith(product_path):
       if fn.endswith(".tif"):
-        cmd = 'curl -u admin:geoserver -XPOST -H "Content-type: text/plain" --write-out %{http_code} -d "https://deppcpublicstorage.blob.core.windows.net/output/' + fn + ' "http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/' + product + '/remote.imagemosaic"'
+        cmd = 'curl -u admin:geoserver -XPOST -H "Content-type: text/plain" --write-out %{http_code} -d "https://deppcpublicstorage.blob.core.windows.net/output/' + fn + '" "http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/' + product + '/remote.imagemosaic"'
         print(cmd)
         f.write(cmd + "\r\n")
 f.close()
