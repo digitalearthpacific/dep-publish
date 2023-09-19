@@ -1,0 +1,34 @@
+HOWTO Mosaics
+-------------
+1. Register
+
+curl -u admin:geoserver -XPUT --write-out %{http_code} -H "Content-type:application/zip" --data-binary @wofs_mosaic.zip http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/wofs/file.imagemosaic?configure=none
+
+curl -u admin:geoserver -XPUT --write-out %{http_code} -H "Content-type:application/zip" --data-binary @mangroves_mosaic.zip http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/mangroves/file.imagemosaic?configure=none
+
+2. Modify product parameters and run loader.py. Execute generated loader.sh on the Geoserver instance.
+
+3. Apply styles
+
+
+HOWTO Coastlines
+________________
+
+1. Generate pSQL from GeoPackage Output. 
+
+2. Populate
+
+PGPASSWORD="xxxx" psql -h prodgeoserver-pg.spc.links.com.au -U geoserver_rw -d prod_geoserver < coastlines.sql
+
+3. Explode and Optimise
+
+alter table coastlines rename to coastlines_old;
+drop table coastlines;
+CREATE TABLE coastlines(fid SERIAL PRIMARY KEY, year int, geom geometry(LineString, 32655)); #3832
+INSERT INTO coastlines(year, geom)
+SELECT year, (ST_Dump(wkb_geometry)).geom
+FROM coastlines_old
+WHERE ST_GeometryType(wkb_geometry) = 'ST_MultiLineString';
+
+create index coastlines_index on coastlines using gist (wkb_geometry);
+
