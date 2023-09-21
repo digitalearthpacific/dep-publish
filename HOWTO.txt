@@ -19,21 +19,26 @@ curl -v -u admin:geoserver -XPOST -H "Content-type: text/xml" -d @"coverage.xml"
 HOWTO Coastlines
 ________________
 
-1. Generate pSQL from GeoPackage Output. 
+1. Reproject to 3832 (PDC Mercator) if required. (or use QGIS, force multi-type)
 
-2. Populate
+ogr2ogr -nlt PROMOTE_TO_MULTI -f gpkg -t_srs epsg:3832 1.gpkg coastlines_4Sep2023.gpkg 
 
-PGPASSWORD="xxxx" psql -h prodgeoserver-pg.spc.links.com.au -U geoserver_rw -d prod_geoserver < coastlines.sql
+2. Populate PostGIS from GeoPackage Output. 
 
-3. Explode and Optimise
+ogr2ogr -nlt PROMOTE_TO_MULTI -f PostgreSQL "PG:user=postgres password=erlang44 dbname=dep" 1.gpkg
+
+3. Reproject columns (i required)
+
+ALTER TABLE coastlines ALTER COLUMN geom TYPE Geometry(MultiLineString) USING ST_Transform(geom, 3832); 
+
+4. Explode and Optimise
 
 alter table coastlines rename to coastlines_old;
-drop table coastlines;
-CREATE TABLE coastlines(fid SERIAL PRIMARY KEY, year int, geom geometry(LineString, 32655)); #3832
-INSERT INTO coastlines(year, geom)
-SELECT year, (ST_Dump(wkb_geometry)).geom
-FROM coastlines_old
-WHERE ST_GeometryType(wkb_geometry) = 'ST_MultiLineString';
+CREATE TABLE coastlines(fid SERIAL PRIMARY KEY, year int, geom geometry(LineString, 3832)); 
+INSERT INTO coastlines(year, geom) SELECT year, (ST_Dump(geom)).geom FROM coastlines_old WHERE ST_GeometryType(geom) = 'ST_MultiLineString';
+create index coastlines_index on coastlines using gist (geom);
+drop table coastlines_old;
 
-create index coastlines_index on coastlines using gist (wkb_geometry);
+5. Register in Geoserver instance using Import Data plugin.
 
+6. Apply styles.
