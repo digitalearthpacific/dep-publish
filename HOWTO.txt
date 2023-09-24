@@ -27,7 +27,7 @@ ogr2ogr -nlt PROMOTE_TO_MULTI -f gpkg -t_srs epsg:3832 1.gpkg coastlines_4Sep202
 
 ogr2ogr -nlt PROMOTE_TO_MULTI -f PostgreSQL "PG:user=postgres password=erlang44 dbname=dep" 1.gpkg
 
-3. Reproject columns (i required)
+3. Reproject columns (if required)
 
 ALTER TABLE coastlines ALTER COLUMN geom TYPE Geometry(MultiLineString) USING ST_Transform(geom, 3832); 
 
