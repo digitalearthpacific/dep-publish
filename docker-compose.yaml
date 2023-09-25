@@ -1,0 +1,28 @@
+services:
+  postgis:
+    image: postgis/postgis:13-3.4
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+  geoserver:
+    image: kartoza/geoserver:2.23.2
+    restart: on-failure
+    environment:
+      GEOSERVER_DATA_DIR: /opt/geoserver/data_dir
+      GEOSERVER_ADMIN_PASSWORD: geoserver
+      GEOSERVER_ADMIN_USER: admin
+      COMMUNITY_EXTENSIONS: cog-plugin
+    ports:
+      - 8080:8080
+    volumes:
+      - ./geoserver_data_dir:/opt/geoserver/data_dir
+    depends_on:
+      - postgis
+  terria:
+    image: ghcr.io/terriajs/terriamap:0.0.8
+    ports:
+      - 3001:3001
