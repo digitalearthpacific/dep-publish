@@ -3,8 +3,10 @@
 1. Register
 
     ```bash
+    zip -r wofs_mosaic.zip wofs_mosaic
     curl -u admin:geoserver -XPUT --write-out %{http_code} -H "Content-type:application/zip" --data-binary @wofs_mosaic.zip http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/wofs/file.imagemosaic?configure=none
 
+    zip -r mangroves_mosaic.zip mangroves_mosaic
     curl -u admin:geoserver -XPUT --write-out %{http_code} -H "Content-type:application/zip" --data-binary @mangroves_mosaic.zip http://localhost:8080/geoserver/rest/workspaces/dep/coveragestores/mangroves/file.imagemosaic?configure=none
     ```
 
